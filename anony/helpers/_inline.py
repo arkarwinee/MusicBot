@@ -152,7 +152,7 @@ class Inline:
             rows += [
                 [
                     self.ikb(
-                        text=lang["owner_url"],
+                        text=lang["owner"],
                         url=config.OWNER_URL,
                     )
                 ]
