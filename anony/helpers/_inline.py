@@ -138,6 +138,7 @@ class Inline:
         rows = [
             [
                 self.ikb(
+                    
                     text=lang["add_me"],
                     url=f"https://t.me/{app.username}?startgroup=true",
                 )
