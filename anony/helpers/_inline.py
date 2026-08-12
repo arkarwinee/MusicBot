@@ -4,6 +4,7 @@
 
 
 from pyrogram import types
+from pyrogram.enums import ButtonStyle
 
 from anony import app, config, lang
 from anony.core.lang import lang_codes
@@ -138,7 +139,7 @@ class Inline:
         rows = [
             [
                 self.ikb(
-                    
+                    style=ButtonStyle.SUCCESS,
                     text=lang["add_me"],
                     url=f"https://t.me/{app.username}?startgroup=true",
                 )
@@ -153,6 +154,7 @@ class Inline:
             rows += [
                 [
                     self.ikb(
+                        style=ButtonStyle.DANGER,
                         text=lang["owner"],
                         url=config.OWNER_URL,
                     )
