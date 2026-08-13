@@ -211,7 +211,7 @@ class MongoDB:
     async def get_cmd_delete(self, chat_id: int) -> bool:
         if chat_id not in self.cmd_delete:
             doc = await self.chatsdb.find_one({"_id": chat_id})
-            if doc and doc.get("cmd_delete"):
+            if doc and doc.get("cmd_delete", config.AUTO_DELETE):
                 self.cmd_delete.append(chat_id)
         return chat_id in self.cmd_delete
 

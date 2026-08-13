@@ -17,3 +17,8 @@ dependencies = [
     "python-dotenv~=1.2.1",
     "yt-dlp[default]>=2026.3.17",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["anony*"]  # Only include your actual package
+exclude = ["cache", "downloads"]  # Ignore these directories
