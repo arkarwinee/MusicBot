@@ -105,7 +105,7 @@ async def _bot_membership_update(_, update: types.ChatMemberUpdated) -> None:
     perms = new.privileges
 
     required_perms = [
-        "can_manage_voice_chats",
+        "can_manage_video_chats",
         "can_invite_users",
     ]
 
