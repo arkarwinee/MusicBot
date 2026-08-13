@@ -29,9 +29,9 @@ async def _broadcast(_, message: types.Message):
     sent = await message.reply_text(message.lang["gcast_start"])
 
     if "-nochat" not in message.command:
-        groups = set(await db.get_chats())
+        groups = set(await db.get_active_chats())
     if "-user" in message.command:
-        users = set(await db.get_users())
+        users = set(await db.get_active_users())
 
     chats = list(groups | users)
     failed = None

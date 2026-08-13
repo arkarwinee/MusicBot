@@ -3,6 +3,7 @@
 # This file is part of AnonXMusic
 
 import asyncio
+from xxlimited import new
 from pyrogram import enums, filters, types
 
 from anony import app, config, db, lang
@@ -44,18 +45,20 @@ async def start(_, message: types.Message):
     )
 
     if private:
-        if await db.is_user(message.from_user.id):
+        if await db.is_active_user(message.from_user.id):
             return
         await utils.send_log(message)
-        await db.add_user(message.from_user.id)
+        await db.register_active_user(message.from_user.id)
     else:
-        if await db.is_chat(message.chat.id):
+        if await db.is_chat_active(message.chat.id):
             return
         await utils.send_log(message, True)
-        await db.add_chat(message.chat.id)
+        await db.register_active_chat(message.chat.id)
 
 
-@app.on_message(filters.command(["playmode", "settings"]) & filters.group & ~app.bl_users)
+@app.on_message(
+    filters.command(["playmode", "settings"]) & filters.group & ~app.bl_users
+)
 @lang.language()
 async def settings(_, message: types.Message):
     admin_only = await db.get_play_mode(message.chat.id)
@@ -70,16 +73,51 @@ async def settings(_, message: types.Message):
     )
 
 
-@app.on_message(filters.new_chat_members, group=7)
+@app.on_chat_member_updated(group=7)
 @lang.language()
-async def _new_member(_, message: types.Message):
-    if message.chat.type != enums.ChatType.SUPERGROUP:
-        return await message.chat.leave()
+async def _bot_membership_update(_, update: types.ChatMemberUpdated) -> None:
+    new = update.new_chat_member
 
-    await asyncio.sleep(3)
-    for member in message.new_chat_members:
-        if member.id == app.id:
-            if await db.is_chat(message.chat.id):
-                return
-            await utils.send_log(message, True)
-            await db.add_chat(message.chat.id)
+    # Only care about updates to the bot's own membership, not other users'
+    if new is None or new.user.id != app.id:
+        return
+
+    if update.chat.type != enums.ChatType.SUPERGROUP:
+        return await update.chat.leave()
+
+    is_new_active = not (await db.is_chat_active(update.chat.id))
+
+    if new.status in (enums.ChatMemberStatus.LEFT, enums.ChatMemberStatus.BANNED):
+        if not is_new_active:
+            await db.unregister_chat(update.chat.id)
+        return
+
+    if is_new_active:
+        await utils.send_log(update, True)
+        await db.register_active_chat(update.chat.id)
+        await app.send_message(
+            update.chat.id,
+            update.lang["welcome_msg"],
+            reply_markup=buttons.start_key(update.lang, False),
+        )
+
+    is_admin = new.status == enums.ChatMemberStatus.ADMINISTRATOR
+    perms = new.privileges
+
+    required_perms = [
+        "can_manage_voice_chats",
+        "can_invite_users",
+    ]
+
+    missing_perms = []
+    for perm in required_perms:
+        if not is_admin or not getattr(perms, perm):
+            missing_perms.append(update.lang[f"perm_{perm}"])
+
+    if missing_perms:
+        text = "\n".join(f"• {perm}" for perm in missing_perms)
+        await app.send_photo(
+            update.chat.id,
+            "anony/assets/permissions.png",
+            caption=update.lang["missing_perms_warning"].format(text),
+        )

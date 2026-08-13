@@ -35,13 +35,13 @@ class MongoDB:
         self.auth = {}
         self.authdb = self.db.auth
 
-        self.chats = []
+        self.active_chats = []
         self.chatsdb = self.db.chats
 
         self.lang = {}
         self.langdb = self.db.lang
 
-        self.users = []
+        self.active_users = []
         self.usersdb = self.db.users
 
     async def connect(self) -> None:
@@ -189,23 +189,23 @@ class MongoDB:
         return doc.get("user_ids", []) if doc else []
 
     # CHAT METHODS
-    async def is_chat(self, chat_id: int) -> bool:
-        return chat_id in self.chats
+    async def is_chat_active(self, chat_id: int) -> bool:
+        return chat_id in self.active_chats
 
-    async def add_chat(self, chat_id: int) -> None:
-        if not await self.is_chat(chat_id):
-            self.chats.append(chat_id)
+    async def register_active_chat(self, chat_id: int) -> None:
+        if not await self.is_chat_active(chat_id):
+            self.active_chats.append(chat_id)
             await self.chatsdb.insert_one({"_id": chat_id})
 
-    async def rm_chat(self, chat_id: int) -> None:
-        if await self.is_chat(chat_id):
-            self.chats.remove(chat_id)
+    async def unregister_chat(self, chat_id: int) -> None:
+        if await self.is_chat_active(chat_id):
+            self.active_chats.remove(chat_id)
             await self.chatsdb.delete_one({"_id": chat_id})
 
-    async def get_chats(self) -> list:
-        if not self.chats:
-            self.chats.extend([chat["_id"] async for chat in self.chatsdb.find()])
-        return self.chats
+    async def get_active_chats(self) -> list:
+        if not self.active_chats:
+            self.active_chats.extend([chat["_id"] async for chat in self.chatsdb.find()])
+        return self.active_chats
 
     # COMMAND DELETE
     async def get_cmd_delete(self, chat_id: int) -> bool:
@@ -295,23 +295,23 @@ class MongoDB:
         return doc.get("user_ids", []) if doc else []
 
     # USER METHODS
-    async def is_user(self, user_id: int) -> bool:
-        return user_id in self.users
+    async def is_active_user(self, user_id: int) -> bool:
+        return user_id in self.active_users
 
-    async def add_user(self, user_id: int) -> None:
-        if not await self.is_user(user_id):
-            self.users.append(user_id)
+    async def register_active_user(self, user_id: int) -> None:
+        if not await self.is_active_user(user_id):
+            self.active_users.append(user_id)
             await self.usersdb.insert_one({"_id": user_id})
 
-    async def rm_user(self, user_id: int) -> None:
-        if await self.is_user(user_id):
-            self.users.remove(user_id)
+    async def unregister_user(self, user_id: int) -> None:
+        if await self.is_active_user(user_id):
+            self.active_users.remove(user_id)
             await self.usersdb.delete_one({"_id": user_id})
 
-    async def get_users(self) -> list:
-        if not self.users:
-            self.users.extend([user["_id"] async for user in self.usersdb.find()])
-        return self.users
+    async def get_active_users(self) -> list:
+        if not self.active_users:
+            self.active_users.extend([user["_id"] async for user in self.usersdb.find()])
+        return self.active_users
 
 
     async def migrate_coll(self) -> None:
@@ -363,8 +363,8 @@ class MongoDB:
         if not doc:
             await self.migrate_coll()
 
-        await self.get_chats()
-        await self.get_users()
+        await self.get_active_chats()
+        await self.get_active_users()
         await self.get_blacklisted(True)
         await self.get_logger()
         logger.info("Database cache loaded.")

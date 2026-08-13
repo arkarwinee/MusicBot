@@ -58,7 +58,17 @@ class Inline:
                 ]
             ]
         else:
-            cbs = ["admins", "auth", "blist", "lang", "ping", "play", "queue", "stats", "sudo"]
+            cbs = [
+                "admins",
+                "auth",
+                "blist",
+                "lang",
+                "ping",
+                "play",
+                "queue",
+                "stats",
+                "sudo",
+            ]
             buttons = [
                 self.ikb(text=_lang[f"help_{i}"], callback_data=f"help {cb}")
                 for i, cb in enumerate(cbs)
@@ -105,7 +115,12 @@ class Inline:
         )
 
     def settings_markup(
-        self, lang: dict, admin_only: bool, cmd_delete: bool, language: str, chat_id: int
+        self,
+        lang: dict,
+        admin_only: bool,
+        cmd_delete: bool,
+        language: str,
+        chat_id: int,
     ) -> types.InlineKeyboardMarkup:
         return self.ikm(
             [
@@ -136,32 +151,34 @@ class Inline:
     def start_key(
         self, lang: dict, private: bool = False
     ) -> types.InlineKeyboardMarkup:
-        rows = [
-            [
-                self.ikb(
-                    style=ButtonStyle.SUCCESS,
-                    text=lang["add_me"],
-                    url=f"https://t.me/{app.username}?startgroup=true",
-                )
-            ],
+        rows = []
+
+        if private:
+            rows += [
+                [
+                    self.ikb(
+                        style=ButtonStyle.SUCCESS,
+                        text=lang["add_me"],
+                        url=f"https://t.me/{app.username}?startgroup=true",
+                    )
+                ],
+            ]
+
+        rows += [
             [self.ikb(text=lang["help"], callback_data="help")],
             [
                 self.ikb(text=lang["support"], url=config.SUPPORT_CHAT),
                 self.ikb(text=lang["channel"], url=config.SUPPORT_CHANNEL),
             ],
+            [
+                self.ikb(
+                    style=ButtonStyle.DANGER,
+                    text=lang["owner"],
+                    url=config.OWNER_URL,
+                )
+            ],
         ]
-        if private:
-            rows += [
-                [
-                    self.ikb(
-                        style=ButtonStyle.DANGER,
-                        text=lang["owner"],
-                        url=config.OWNER_URL,
-                    )
-                ]
-            ]
-        else:
-            rows += [[self.ikb(text=lang["language"], callback_data="language")]]
+
         return self.ikm(rows)
 
     def yt_key(self, link: str) -> types.InlineKeyboardMarkup:

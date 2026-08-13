@@ -77,7 +77,7 @@
   "play_next": "ခဏစောင့်ပါ...\n\nတန်းစီစာရင်းမှ နောက်မီဒီယာကို ဒေါင်းလုဒ်လုပ်နေသည်။",
   "play_invite": "ခဏစောင့်ပါ...\n\n{0} လက်ထောက်ကို သင့်ချတ်သို့ ဖိတ်ကြားနေသည်။",
   "play_searching": "ရှာဖွေနေသည်...",
-  "play_downloading": "ဒေါင်းလုဒ်လုပ်နေသည်...\n\n<b>Title:</b> <a href={0}>{1}</a>\n\n<b>Duration:</b> {2} min\n<b>Requested by:</b> {3}",
+  "play_downloading": "<u><b>| ဒေါင်းလုဒ်လုပ်နေသည်...</b></u>\n\n<b>Title:</b> <a href={0}>{1}</a>\n\n<b>Duration:</b> {2} min\n<b>Requested by:</b> {3}",
   "play_paused": "<b>{0} မှ ထုတ်လွှင့်မှုကို ခေတ္တရပ်ထားသည်</b>",
   "play_resumed": "<b>{0} မှ ထုတ်လွှင့်မှုကို ပြန်လည်စတင်သည်</b>",
   "play_replayed": "<b>{0} မှ ထုတ်လွှင့်မှုကို ပြန်လည်ဖွင့်သည်</b>",
@@ -151,5 +151,10 @@
   "help_5": "ဖွင့်ပါ",
   "help_6": "တန်းစီစာရင်း",
   "help_7": "အချက်အလက်",
-  "help_8": "Sudoers"
+  "help_8": "Sudoers",
+
+  "perm_can_manage_voice_chats": "Manage video chats",
+  "perm_can_invite_users": "Invite users via link",
+  "missing_perms_warning": "ဤအုပ်စုတွင် မှန်ကန်စွာ လုပ်ဆောင်နိုင်ရန် ခွင့်ပြုချက်အချို့ လိုအပ်နေပါသည်။:\n\n{}",
+  "welcome_msg": "👋 Thanks for adding me!\n\nI'm a music bot — I can stream audio and video into this group's video chat from YouTube, Spotify, and more."
 }

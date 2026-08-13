@@ -31,8 +31,8 @@ async def _stats(_, m: types.Message):
         len(db.blacklisted),
         len(app.bl_users),
         len(app.sudoers),
-        len(await db.get_chats()),
-        len(await db.get_users()),
+        len(await db.get_active_chats()),
+        len(await db.get_active_users()),
     )
     if m.from_user.id in app.sudoers:
         process = psutil.Process(pid)
