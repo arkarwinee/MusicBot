@@ -17,7 +17,7 @@ class MongoDB:
         Initialize the MongoDB connection.
         """
         self.mongo = AsyncMongoClient(config.MONGO_URL, serverSelectionTimeoutMS=12500)
-        self.db = self.mongo.Anon
+        self.db = self.mongo[config.DB_NAME]
 
         self.admin_list = {}
         self.active_calls = {}
@@ -29,8 +29,8 @@ class MongoDB:
         self.cache = self.db.cache
         self.logger = False
 
-        self.assistant = {}
-        self.assistantdb = self.db.assistant
+        self.assistants = {}
+        self.assistantsdb = self.db.assistant
 
         self.auth = {}
         self.authdb = self.db.auth
@@ -120,35 +120,35 @@ class MongoDB:
     # ASSISTANT METHODS
     async def set_assistant(self, chat_id: int) -> int:
         num = randint(1, len(userbot.clients))
-        await self.assistantdb.update_one(
+        await self.assistantsdb.update_one(
             {"_id": chat_id},
             {"$set": {"num": num}},
             upsert=True,
         )
-        self.assistant[chat_id] = num
+        self.assistants[chat_id] = num
         return num
 
     async def get_assistant(self, chat_id: int):
         from anony import anon
 
-        if chat_id not in self.assistant:
-            doc = await self.assistantdb.find_one({"_id": chat_id})
+        if chat_id not in self.assistants:
+            doc = await self.assistantsdb.find_one({"_id": chat_id})
             num = doc["num"] if doc else None
 
             if not num or num > len(anon.clients):
                 num = await self.set_assistant(chat_id)
-            self.assistant[chat_id] = num
+            self.assistants[chat_id] = num
 
-        return anon.clients[self.assistant[chat_id] - 1]
+        return anon.clients[self.assistants[chat_id] - 1]
 
     async def get_client(self, chat_id: int):
-        if chat_id not in self.assistant:
+        if chat_id not in self.assistants:
             await self.get_assistant(chat_id)
 
-        num = self.assistant[chat_id]
+        num = self.assistants[chat_id]
         if num > len(userbot.clients):
             num = await self.set_assistant(chat_id)
-            self.assistant[chat_id] = num
+            self.assistants[chat_id] = num
 
         return {1: userbot.one, 2: userbot.two, 3: userbot.three}.get(num)
 
