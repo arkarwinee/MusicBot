@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
 
-import asyncio
 from xxlimited import new
 from pyrogram import enums, filters, types
 
